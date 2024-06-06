@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-//#include <sys/socket.h>
-//#include <netinet/in.h>
-//#include <netinet/ip.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
@@ -56,7 +53,7 @@ int main() {
 	printf("Waiting for a client to connect...\n");
 	client_addr_len = sizeof(client_addr);
 	
-	accept(server_fd, (struct sockaddr *) &client_addr, &client_addr_len);
+	//accept(server_fd, (struct sockaddr *) &client_addr, &client_addr_len);
 	int fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
   	printf("Client connected\n");
   	char *reply = "HTTP/1.1 200 OK\r\n\r\n";

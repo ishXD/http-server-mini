@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <winsock.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
 //#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/ip.h>
+//#include <netinet/in.h>
+//#include <netinet/ip.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>

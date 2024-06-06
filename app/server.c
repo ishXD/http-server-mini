@@ -59,7 +59,7 @@ int main() {
 	int fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
 
 
-	char response[] = "HTTP/1.1 200 OK\r\n\r\n";
+	char *response = "HTTP/1.1 200 OK\r\n\r\n";
 	int send_response = send(fd, response, strlen(response), 0);
 	
 	close(server_fd);

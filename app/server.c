@@ -60,7 +60,7 @@ int main() {
 
 
 	char *response = "HTTP/1.1 200 OK\r\n\r\n";
-	int send_response = send(fd, response, strlen(response), 0);
+	send(fd, response, strlen(response), 0);
 	
 	close(server_fd);
 

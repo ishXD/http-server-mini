@@ -5,7 +5,8 @@
             "includePath": [
                 "${default}",
                 "C:/esp/esp-idf/components/newlib/platform_include",
-                "C:/esp/esp-idf/components/newlib/platform_include"
+                "C:/esp/esp-idf/components/newlib/platform_include",
+                "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit"
             ],
             "defines": [
                 "_DEBUG",

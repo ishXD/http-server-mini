@@ -79,7 +79,7 @@ int main() {
 	}
 	else if(strncmp(url,"/echo/",6) == 0){
 		char *echo_msg = url + 6;
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 3\r\n\r\n%s",echo_msg);
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
 	}
 	else{
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");

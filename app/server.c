@@ -11,6 +11,7 @@ int main() {
 	// Disable output buffering
 	setbuf(stdout, NULL);
  	setbuf(stderr, NULL);
+	char buffer[1024]={0};
 
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	printf("Logs from your program will appear here!\n");
@@ -58,6 +59,28 @@ int main() {
   	printf("Client connected\n");
   	char *reply = "HTTP/1.1 200 OK\r\n\r\n";
   	int bytes_sent = send(fd, reply, strlen(reply), 0);
+
+	//recieve msg
+	int msg_Read = read(fd, buffer, 1024);
+	if (msg_Read<0){
+		printf("read failed");
+		return 1;
+	}
+	printf("Received HTTP request:\n%s\n", buffer);
+
+	//Extract URL
+	char method[16], url[256], protocol[16];
+	sscanf(buffer,"%s %s %s", method,url,protocol);
+	
+	char response[];
+
+	if(sizeof(buffer)==21)
+		response = "HTTP/1.1 200 OK\r\n\r\n";
+	else
+		response = "HTTP/1.1 404 Not Found\r\n\r\n";
+	
+	write(fd, response, sizeof(response) - 1);
+
 
 	close(server_fd);
 

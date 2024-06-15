@@ -54,7 +54,6 @@ int main() {
 	printf("Waiting for a client to connect...\n");
 	client_addr_len = sizeof(client_addr);
 	
-	//accept(server_fd, (struct sockaddr *) &client_addr, &client_addr_len);
 	int fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
   	printf("Client connected\n");
   	//char *reply = "HTTP/1.1 200 OK\r\n\r\n";
@@ -73,17 +72,18 @@ int main() {
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
 	
-	char response[50];
+	char *response;
 
 	if (strcmp(url, "/") == 0){
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
+		snprintf(response, strlen(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 	}
 	else{
-		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
+		snprintf(response, strlen(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}
 	printf("response : %s\n", response);
+	int bytes_sent = send(fd, response, strlen(response), 0);
 
-	write(fd, response, sizeof(response) - 1);
+	//write(fd, response, sizeof(response) - 1);
 
 	close(server_fd);
 

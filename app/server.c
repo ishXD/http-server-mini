@@ -81,6 +81,8 @@ int main() {
 	else{
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n");
 	}
+	printf("response : %s\n", response);
+	
 	write(fd, response, sizeof(response) - 1);
 
 	close(server_fd);

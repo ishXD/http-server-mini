@@ -82,7 +82,7 @@ int main() {
 	}
 	printf("response : %s\n", response);
 
-	write(fd, response, sizeof(response) - 1);
+	write(fd, response, strlen(response) - 1);
 
 	close(server_fd);
 

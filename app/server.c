@@ -81,9 +81,8 @@ int main() {
 		snprintf(response, strlen(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}
 	printf("response : %s\n", response);
-	int bytes_sent = send(fd, response, strlen(response), 0);
 
-	//write(fd, response, sizeof(response) - 1);
+	write(fd, response, sizeof(response) - 1);
 
 	close(server_fd);
 

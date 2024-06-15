@@ -57,8 +57,8 @@ int main() {
 	//accept(server_fd, (struct sockaddr *) &client_addr, &client_addr_len);
 	int fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
   	printf("Client connected\n");
-  	char *reply = "HTTP/1.1 200 OK\r\n\r\n";
-  	int bytes_sent = send(fd, reply, strlen(reply), 0);
+  	//char *reply = "HTTP/1.1 200 OK\r\n\r\n";
+  	//int bytes_sent = send(fd, reply, strlen(reply), 0);
 
 	//recieve msg
 	int msg_Read = read(fd, buffer, 1024);

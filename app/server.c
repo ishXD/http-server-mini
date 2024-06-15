@@ -72,17 +72,16 @@ int main() {
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
 	
-	char *response;
+	char response[50];
 
 	if (strcmp(url, "/") == 0){
-		snprintf(response, strlen(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 	}
 	else{
-		snprintf(response, strlen(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
+		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}
-	printf("response : %s\n", response);
-
-	write(fd, response, strlen(response) - 1);
+	
+	write(fd, response, sizeof(response) - 1);
 
 	close(server_fd);
 

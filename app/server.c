@@ -72,7 +72,7 @@ int main() {
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
 
-	char *user_agent = strstr(buffer, "User-Agent:");
+	char *user_agent = strstr(url, "User-Agent:");
 	if(user_agent){
 		user_agent+=12;
 		char *eol = strstr(user_agent,"\r\n");

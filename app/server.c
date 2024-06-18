@@ -82,6 +82,7 @@ int main() {
 	else{
 		user_agent = "User-Agent not found";
 	}
+	printf("useragent: %s", user_agent);
 	
 	char response[1024];
 
@@ -92,6 +93,7 @@ int main() {
 		char *echo_msg = url + 6;
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s %s",strlen(echo_msg),echo_msg,user_agent);
 	}
+	
 	else{
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}

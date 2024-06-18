@@ -72,26 +72,29 @@ int main() {
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
 
-	char *user_agent = strstr(url, "User-Agent:");
-	if(user_agent){
-		user_agent+=12;
-		char *eol = strstr(user_agent,"\r\n");
-		if(eol)*eol = '\0';
-		else return 1;
-	}
-	else{
-		user_agent = "User-Agent not found";
-	}
-	printf("useragent: %s", user_agent);
-	
 	char response[1024];
 
 	if (strcmp(url, "/") == 0){
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 	}
+
 	else if(strncmp(url,"/echo/",6) == 0){
 		char *echo_msg = url + 6;
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s %s",strlen(echo_msg),echo_msg,user_agent);
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+	}
+
+	else if(strncmp(url,"/user-agent",11) == 0){
+		char *user_agent = strstr(url, "User-Agent:");
+		if(user_agent){
+			user_agent+=12;
+			char *eol = strstr(user_agent,"\r\n");
+			if(eol)*eol = '\0';
+			else return 1;
+		}
+		else{
+			user_agent = "User-Agent not found";
+		}
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
 	
 	else{

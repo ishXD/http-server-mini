@@ -84,7 +84,7 @@ int main() {
 	}
 
 	else if(strncmp(url,"/user-agent",11) == 0){
-		char *user_agent = strstr(url, "User-Agent:");
+		char *user_agent = strstr(buffer, "User-Agent:");
 		if(user_agent){
 			user_agent+=12;
 			char *eol = strstr(user_agent,"\r\n");

@@ -80,7 +80,7 @@ int main() {
 		else return 1;
 	}
 	else{
-		user_agent = "User-Agent not found "
+		user_agent = "User-Agent not found";
 	}
 	
 	char response[1024];

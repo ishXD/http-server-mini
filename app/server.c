@@ -94,6 +94,7 @@ int main() {
 		else{
 			user_agent = "User-Agent not found";
 		}
+		printf("user-agent: %s", user_agent);
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
 	

@@ -71,15 +71,26 @@ int main() {
 	char method[16], url[256], protocol[16];
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
+
+	char *user_agent = strstr(buffer, "User-Agent:");
+	if(user_agent){
+		user_agent+=12;
+		char *eol = strstr(user_agent,"\r\n");
+		if(eol)*eol = '\0';
+		else return 1;
+	}
+	else{
+		user_agent = "User-Agent not found "
+	}
 	
 	char response[1024];
 
 	if (strcmp(url, "/") == 0){
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
 	else if(strncmp(url,"/echo/",6) == 0){
 		char *echo_msg = url + 6;
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s %s",strlen(echo_msg),echo_msg,user_agent);
 	}
 	else{
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");

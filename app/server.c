@@ -9,7 +9,6 @@
 #include <pthread.h>
 
 
-
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
@@ -32,7 +31,25 @@ void *handle_request(void *socket_desc){
 	char response[1024];
 
 	if (strcmp(method, "GET") == 0) {
-        snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n200 OK");
+		if(strncmp(url,"/files/",7) == 0){
+			char *file_requested = url + 7;
+			FILE *file = fopen(file_requested,"r");
+			if(file == NULL)
+				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
+
+			else{
+				char file_buffer[1024];
+				size_t read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
+				file_buffer[read] = '\0';
+				fclose(file);
+
+				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", strlent(file_buffer), file_buffer);)
+			}
+		}
+		else{
+			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n200 OK");
+		}
+        	
     }
 
 	if (strcmp(url, "/") == 0){

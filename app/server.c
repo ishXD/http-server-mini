@@ -55,9 +55,8 @@ void *handle_request(void *socket_desc){
 		}
 		else{
 			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n");	
-		}
-	}       	
-	}
+		}        	
+    }
 
 	if (strcmp(url, "/") == 0){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");

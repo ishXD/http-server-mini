@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define BUFFER_SIZE 1024
 
@@ -46,7 +48,7 @@ void *handle_request(void *socket_desc){
 
 			FILE *file = fopen(file_path,"r");
 			if(file == NULL)
-				snprintf(response, sizeof(response),"HTTP/1.1  200 Not Found\r\n\r\n\r\n");
+				snprintf(response, sizeof(response),"HTTP/1.1  404 Not Found\r\n\r\n\r\n");
 
 			else{
 				char file_buffer[BUFFER_SIZE];

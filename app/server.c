@@ -40,13 +40,13 @@ void *handle_request(void *socket_desc){
 
 			char file_path[BUFFER_SIZE];
 
-			snprintf(file_path, sizeof(file_path), "%s/%s", directory, file_requested);
+			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
 			printf("%s", file_path);
 
 
 			FILE *file = fopen(file_path,"r");
 			if(file == NULL)
-				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
+				snprintf(response, sizeof(response),"HTTP/1.1  200 Not Found\r\n\r\n\r\n");
 
 			else{
 				char file_buffer[BUFFER_SIZE];
@@ -54,7 +54,7 @@ void *handle_request(void *socket_desc){
 				file_buffer[read] = '\0';
 				fclose(file);
 
-				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
+				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
 			}
 		}
 		else{

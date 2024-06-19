@@ -13,12 +13,14 @@
 void handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
+	
+	char buffer[1024]={0};
 
 	//recieve msg
 	int msg_Read = read(fd, buffer, 1024);
 	if (msg_Read<0){
 		printf("read failed");
-		return 1;
+		
 	}
 	printf("Received HTTP request:\n%s\n", buffer);
 
@@ -44,7 +46,7 @@ void handle_request(void *socket_desc){
 			user_agent+=12;
 			char *eol = strstr(user_agent,"\r\n");
 			if(eol)*eol = '\0';
-			else return 1;
+			
 		}
 		else{
 			user_agent = "User-Agent not found";
@@ -66,7 +68,7 @@ void handle_request(void *socket_desc){
 int main() {
 	setbuf(stdout, NULL);
  	setbuf(stderr, NULL);
-	char buffer[1024]={0};
+	
 
 	printf("Logs from your program will appear here!\n");
 
@@ -106,7 +108,7 @@ int main() {
 	printf("Waiting for a client to connect...\n");
 	client_addr_len = sizeof(client_addr);
 	
-	int fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
+	int *fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
   	printf("Client connected\n");
 
 	pthread_t thread_id;

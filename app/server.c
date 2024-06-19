@@ -8,37 +8,48 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#define BUFFER_SIZE 1024
+
+char directory[BUFFER_SIZE] = "."; //current directory
 
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
 	
-	char buffer[1024]={0};
+	char buffer[BUFFER_SIZE]={0};
 
 	//recieve msg
-	int msg_Read = read(fd, buffer, 1024);
+	int msg_Read = read(fd, buffer, BUFFER_SIZE);
 	if (msg_Read<0){
 		printf("read failed");
 		
 	}
-	printf("Received HTTP request:\n%s\n", buffer);
+	//printf("Received HTTP request:\n%s\n", buffer);
 
 	//Extract URL
 	char method[16], url[256], protocol[16];
 	sscanf(buffer,"%s %s %s", method,url,protocol);
-	printf("URL: %s\n", url);
+	//printf("URL: %s\n", url);
 
-	char response[1024];
+	char response[BUFFER_SIZE];
 
 	if (strcmp(method, "GET") == 0) {
 		if(strncmp(url,"/files/",7) == 0){
+
 			char *file_requested = url + 7;
-			FILE *file = fopen(file_requested,"r");
+
+			char file_path[BUFFER_SIZE];
+			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
+
+			
+
+
+			FILE *file = fopen(file_path,"r");
 			if(file == NULL)
 				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 
 			else{
-				char file_buffer[1024];
+				char file_buffer[BUFFER_SIZE];
 				size_t read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
 				file_buffer[read] = '\0';
 				fclose(file);
@@ -87,12 +98,19 @@ void *handle_request(void *socket_desc){
 
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	setbuf(stdout, NULL);
  	setbuf(stderr, NULL);
 	
-
 	printf("Logs from your program will appear here!\n");
+
+	for(int i = 1; i<argc; i++){
+		if(strcmp(argv[i],"--directory") == 0){
+			strncpy(directory, argv[i+1], sizeof(directory) - 1);
+			directory[sizeof(directory) - 1] = '\0';
+		}
+	}
+	printf("directory: %s\n", directory);
 
 	int server_fd, client_addr_len, *fd;
 	struct sockaddr_in client_addr;

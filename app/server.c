@@ -35,34 +35,29 @@ void *handle_request(void *socket_desc){
 
 	char response[BUFFER_SIZE];
 
-	if (strcmp(method, "GET") == 0) {
-		if(strncmp(url,"/files/",7) == 0){
+	if(strncmp(url,"/files/",7) == 0){
 
-			char *file_requested = url + 7;
+		char *file_requested = url + 7;
 
-			char file_path[BUFFER_SIZE];
+		char file_path[BUFFER_SIZE];
 
-			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
-			
-			FILE *file = fopen(file_path,"r");
+		snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
+		
+		FILE *file = fopen(file_path,"r");
 
-			if(file != NULL){
-				char file_buffer[BUFFER_SIZE];
-				int bytes_read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
-				file_buffer[bytes_read] = '\0';
-				fclose(file);
+		if(file != NULL){
+			char file_buffer[BUFFER_SIZE];
+			int bytes_read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
+			file_buffer[bytes_read] = '\0';
+			fclose(file);
 
-				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
-			}
-			else{
-				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n");	
-			}
+			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
 		}
 		else{
-			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n200 OK");
+			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n");	
 		}
-        	
-    }
+	}       	
+	}
 
 	if (strcmp(url, "/") == 0){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");

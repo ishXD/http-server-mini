@@ -31,6 +31,10 @@ void *handle_request(void *socket_desc){
 
 	char response[1024];
 
+	if (strcmp(method, "GET") == 0) {
+        snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n200 OK");
+    }
+
 	if (strcmp(url, "/") == 0){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 	}
@@ -118,6 +122,8 @@ int main() {
 		free(fd);
 		return 1;
 	}
+	
+	pthread_detach(thread_id);
 
 	close(server_fd);
 

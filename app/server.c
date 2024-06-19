@@ -45,9 +45,9 @@ void *handle_request(void *socket_desc){
 			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
 			
 			FILE *file = fopen(file_path,"r");
-			
+
 			if(file != NULL){
-				char *file_buffer[BUFFER_SIZE];
+				char file_buffer[BUFFER_SIZE];
 				int bytes_read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
 				file_buffer[bytes_read] = '\0';
 				fclose(file);

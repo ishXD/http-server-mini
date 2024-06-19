@@ -66,6 +66,7 @@ void *handle_request(void *socket_desc){
 	write(fd, response, sizeof(response) - 1);
 
 	close(fd);
+	return NULL;
 
 }
 
@@ -108,22 +109,21 @@ int main() {
 		printf("Listen failed: %s \n", strerror(errno));
 		return 1;
 	}
-	
-	printf("Waiting for a client to connect...\n");
-	client_addr_len = sizeof(client_addr);
-	
-	fd = malloc(sizeof(int));
-	*fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
-  	printf("Client connected\n");
+	while(1){
+		printf("Waiting for a client to connect...\n");
+		client_addr_len = sizeof(client_addr);
+		
+		fd = malloc(sizeof(int));
+		*fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_addr_len);
+		printf("Client connected\n");
 
-	pthread_t thread_id;
-	if(pthread_create(&thread_id, NULL, handle_request,(void*)fd) < 0){
-		printf("Could not create thread");
-		free(fd);
-		return 1;
+		pthread_t thread_id;
+		if(pthread_create(&thread_id, NULL, handle_request,(void*)fd) < 0){
+			printf("Could not create thread");
+			free(fd);
+		}
+		pthread_detach(thread_id);
 	}
-	
-	pthread_detach(thread_id);
 
 	close(server_fd);
 

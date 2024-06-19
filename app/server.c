@@ -40,11 +40,12 @@ void *handle_request(void *socket_desc){
 
 			char file_path[BUFFER_SIZE];
 
-			snprintf(file_path, sizeof(file_path), "%s%s.txt", directory, file_requested);
+			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
 			printf("%s", file_path);
 
 
 			FILE *file = fopen(file_path,"r");
+			printf(file);
 			if(file == NULL)
 				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 

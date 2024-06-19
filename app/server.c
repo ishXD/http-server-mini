@@ -52,7 +52,7 @@ void *handle_request(void *socket_desc){
 
 			else{
 				char file_buffer[BUFFER_SIZE];
-				size_t read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
+				int read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
 				file_buffer[read] = '\0';
 				fclose(file);
 

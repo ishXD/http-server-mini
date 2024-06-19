@@ -31,7 +31,7 @@ void *handle_request(void *socket_desc){
 	//Extract URL
 	char method[16], url[256], protocol[16];
 	sscanf(buffer,"%s %s %s", method,url,protocol);
-	//printf("URL: %s\n", url);
+	printf("URL: %s\n", url);
 
 	char response[BUFFER_SIZE];
 
@@ -54,11 +54,11 @@ void *handle_request(void *socket_desc){
 			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
 		}
 		else{
-			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n");	
+			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");	
 		}        	
     }
 
-	if (strcmp(url, "/") == 0){
+	else if (strcmp(url, "/") == 0){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 	}
 
@@ -82,7 +82,7 @@ void *handle_request(void *socket_desc){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
 	
-	else if(strcmp(url,"/")!=0){
+	else{
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}
 

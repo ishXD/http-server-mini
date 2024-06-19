@@ -10,7 +10,7 @@
 
 
 
-void handle_request(void *socket_desc){
+void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
 	

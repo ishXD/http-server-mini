@@ -24,7 +24,7 @@ void *handle_request(void *socket_desc){
 		printf("read failed");
 		
 	}
-	//printf("Received HTTP request:\n%s\n", buffer);
+	printf("Received HTTP request:\n%s\n", buffer);
 
 	//Extract URL
 	char method[16], url[256], protocol[16];
@@ -40,10 +40,8 @@ void *handle_request(void *socket_desc){
 
 			char file_path[BUFFER_SIZE];
 
-			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
+			snprintf(file_path, sizeof(file_path), "%s%s/", directory, file_requested);
 			printf("%s", file_path);
-
-			
 
 
 			FILE *file = fopen(file_path,"r");

@@ -82,7 +82,7 @@ void *handle_request(void *socket_desc){
 		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
 	
-	else{
+	else if(strcmp(url,"/")!=0){
 		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 	}
 

@@ -54,9 +54,9 @@ void *handle_request(void *socket_desc){
 
 				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
 			}
-			// else{
-			// 	snprintf(response, sizeof(response),"HTTP/1.1  200 OK\r\n\r\n\r\n");	
-			// }
+			else{
+				snprintf(response, sizeof(response),"HTTP/1.1  200 OK\r\n\r\n\r\n");	
+			}
 		}
 		else{
 			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n200 OK");

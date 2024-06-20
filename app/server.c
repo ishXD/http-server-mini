@@ -16,26 +16,24 @@
 
 char directory[BUFFER_SIZE] = "."; //current directory
 
-char *compress_to_gzip(char *input, int input_len, size_t *gzip_len){
+static char *compress_to_gzip(char *input, size_t input_len, size_t *gzip_len){
 	z_stream zs;
 	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8, Z_DEFAULT_STRATEGY);
-	int max_len = deflateBound(&zs, input_len);
+	size_t max_len = deflateBound(&zs, input_len);
 	char *gzip_data = malloc(max_len);
 	memset(gzip_data, 0, max_len);
-	zs.zalloc = Z_NULL;
-	zs.zfree = Z_NULL;
-	zs.opaque = Z_NULL;
-	zs.avail_in = input_len;
 	zs.next_in = (Bytef *)input;
-	zs.avail_out = max_len;
+	zs.avail_in = input_len;
 	zs.next_out = (Bytef *)gzip_data;
-
+	zs.avail_out = max_len;
+	
     deflate(&zs, Z_FINISH);
 	*gzip_len = zs.total_out;
     deflateEnd(&zs);
     return gzip_data;
 
 }
+
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);

@@ -16,7 +16,7 @@
 
 char directory[BUFFER_SIZE] = "."; //current directory
 
-char *compress_to_gzip(char *input, int input_len, int *gzip_len){
+char *compress_to_gzip(char *input, int input_len, size_t *gzip_len){
 	z_stream zs;
 	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8, Z_DEFAULT_STRATEGY);
 	int max_len = deflateBound(&zs, input_len);
@@ -102,7 +102,7 @@ void *handle_request(void *socket_desc){
 					char *compressed_buffer;
 					long long compressed_len;
 					compressed_buffer = compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len);
-					
+
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);
 					write(fd, compressed_buffer, compressed_len);

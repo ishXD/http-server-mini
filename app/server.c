@@ -10,9 +10,8 @@
 #include <sys/types.h>
 #include <zlib.h>
 
-#define CHUNK 16384
-#define BUFFER_SIZE 1024
 
+#define BUFFER_SIZE 1024
 
 char directory[BUFFER_SIZE] = "."; //current directory
 
@@ -102,16 +101,13 @@ void *handle_request(void *socket_desc){
 					long unsigned int compressed_len;
 					
 					compressed_buffer = gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len);
-					printf("gzip: %s",gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len));
-					
+	
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %ld\r\n\r\n",compressed_len);
-					send(fd, response, strlen(response), 0);
+					
+					send(fd, response, strlen(response), 0);//write() gives gzip:invalid header error
     				send(fd, compressed_buffer, compressed_len, 0);
-
-					return;
-					//write() gives gzip:invalid header error
-					// write(fd, response, sizeof(response) - 1);
-					// write(fd, compressed_buffer, compressed_len);
+				
+					return NULL;
 				}
 				else{
 					snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);

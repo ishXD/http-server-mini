@@ -96,10 +96,7 @@ void *handle_request(void *socket_desc){
 				encodings[encoding_crlf - (encoding_header + 17)] = '\0';
 
 				if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0){
-					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
-					write(fd, response, sizeof(response) - 1);
-					write(fd, compressed_buffer, compressed_len);
-
+					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",compressed_len, compressed_buffer);
 				}
 				else{
 					snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);

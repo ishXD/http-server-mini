@@ -90,29 +90,32 @@ void *handle_request(void *socket_desc){
 	}
 
 	else if (strcmp(method,"POST") == 0){
-		if(strncmp(url,"/files",7) == 0){
-			char *file_requested = url + 7;
-			char file_path[BUFFER_SIZE];
-			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
+		char *file_requested = url + 7;
 
-			char *body = strstr(buffer,"\r\n\r\n");
-			if(body == NULL){
-				snprintf(response,sizeof(response),"HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\n400 Bad Request");
+		char file_path[BUFFER_SIZE];
+
+		snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
+
+		char *body = strstr(buffer,"\r\n\r\n");
+		if(body == NULL){
+			snprintf(response,sizeof(response),"HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\n400 Bad Request");
+		}
+		else{
+			body += 4;
+			FILE *file = fopen(file_path,"w");
+			if (file == NULL){
+				printf("Error creating file: %s\n", strerror(errno));
 			}
 			else{
-				body += 4;
-				FILE *file = fopen(file_path,"w");
-				if (file == NULL){
-					printf("Error creating file: %s\n", strerror(errno));
-				}
-				else{
-					fprintf(file, "%s",body);
-					fclose(file);
+				fprintf(file, "%s",body);
+				fclose(file);
 
-					snprintf(response,sizeof(response), "HTTP/1.1 201 Created\r\n\r\n" );					
-				}					
-			}			
-		}
+				snprintf(response,sizeof(response), "HTTP/1.1 201 Created\r\n\r\n" );					
+			}					
+		}				
+	}
+	else{
+		snprintf(response, sizeof(response), "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n405 Method Not Allowed");
 	}	
 
 	write(fd, response, sizeof(response) - 1);

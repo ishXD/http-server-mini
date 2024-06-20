@@ -88,7 +88,7 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
-			printf("gzip: %s",compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len));
+			
 
 			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
 			if(encoding_header != NULL){
@@ -102,6 +102,7 @@ void *handle_request(void *socket_desc){
 					long unsigned int compressed_len;
 					
 					compressed_buffer = gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len);
+					printf("gzip: %s",gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len));
 					
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);

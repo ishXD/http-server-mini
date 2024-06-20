@@ -16,22 +16,21 @@
 
 char directory[BUFFER_SIZE] = "."; //current directory
 
-static char *compress_to_gzip(char *input, size_t input_len, size_t *gzip_len){
-	z_stream zs = {0};
-	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8, Z_DEFAULT_STRATEGY);
-	size_t max_len = deflateBound(&zs, input_len);
-	char *gzip_data = malloc(max_len);
-	memset(gzip_data, 0, max_len);
-	zs.next_in = (Bytef *)input;
-	zs.avail_in = input_len;
-	zs.next_out = (Bytef *)gzip_data;
-	zs.avail_out = max_len;
-	
-    deflate(&zs, Z_FINISH);
-	*gzip_len = zs.total_out;
-    deflateEnd(&zs);
-    return gzip_data;
-
+static char *gzip_deflate(char *data, size_t data_len, size_t *gzip_len) {
+  z_stream stream = {0};
+  deflateInit2(&stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8,
+               Z_DEFAULT_STRATEGY);
+  size_t max_len = deflateBound(&stream, data_len);
+  char *gzip_data = malloc(max_len);
+  memset(gzip_data, 0, max_len);
+  stream.next_in = (Bytef *)data;
+  stream.avail_in = data_len;
+  stream.next_out = (Bytef *)gzip_data;
+  stream.avail_out = max_len;
+  deflate(&stream, Z_FINISH);
+  *gzip_len = stream.total_out;
+  deflateEnd(&stream);
+  return gzip_data;
 }
 
 void *handle_request(void *socket_desc){
@@ -89,8 +88,6 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
-			long unsigned int compressed_len;
-
 			printf("gzip: %s",compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len));
 
 			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
@@ -102,10 +99,10 @@ void *handle_request(void *socket_desc){
 
 				if(strstr(encodings,"gzip") != NULL){
 					char *compressed_buffer;
-					//long unsigned int compressed_len;
-					compressed_buffer = compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len);
-					printf("gzip: %s",compressed_buffer);
-
+					long unsigned int compressed_len;
+					
+					compressed_buffer = gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len);
+					
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);
 					write(fd, compressed_buffer, compressed_len);

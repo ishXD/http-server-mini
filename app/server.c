@@ -53,7 +53,7 @@ void *handle_request(void *socket_desc){
 	char method[16], url[256], protocol[16];
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
-	printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
+	
 
 	char response[BUFFER_SIZE];
 
@@ -89,6 +89,7 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
+			printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
 			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
 			if(encoding_header != NULL){
 				char *encoding_crlf = strstr(encoding_header,"\r\n");

@@ -35,56 +35,85 @@ void *handle_request(void *socket_desc){
 
 	char response[BUFFER_SIZE];
 
-	if(strncmp(url,"/files/",7) == 0){
+	if(strcmp(method,"GET") == 0){
 
-		char *file_requested = url + 7;
+		if(strncmp(url,"/files/",7) == 0){
 
-		char file_path[BUFFER_SIZE];
+			char *file_requested = url + 7;
 
-		snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
-		
-		FILE *file = fopen(file_path,"r");
+			char file_path[BUFFER_SIZE];
 
-		if(file != NULL){
-			char file_buffer[BUFFER_SIZE];
-			int bytes_read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
-			file_buffer[bytes_read] = '\0';
-			fclose(file);
-
-			snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
-		}
-		else{
-			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");	
-		}        	
-    }
-
-	else if (strcmp(url, "/") == 0){
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
-	}
-
-	else if(strncmp(url,"/echo/",6) == 0){
-		char *echo_msg = url + 6;
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
-	}
-
-	else if(strncmp(url,"/user-agent",11) == 0){
-		char *user_agent = strstr(buffer, "User-Agent:");
-		if(user_agent){
-			user_agent+=12;
-			char *eol = strstr(user_agent,"\r\n");
-			if(eol)*eol = '\0';
+			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
 			
+			FILE *file = fopen(file_path,"r");
+
+			if(file != NULL){
+				char file_buffer[BUFFER_SIZE];
+				int bytes_read = fread(file_buffer, 1, sizeof(file_buffer) - 1, file);
+				file_buffer[bytes_read] = '\0';
+				fclose(file);
+
+				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s", strlen(file_buffer), file_buffer);
+			}
+			else{
+				snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");	
+			}        	
+    	}
+
+		else if (strcmp(url, "/") == 0){
+			snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\n\r\n\r\n");
 		}
+
+		else if(strncmp(url,"/echo/",6) == 0){
+			char *echo_msg = url + 6;
+			snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+		}
+
+		else if(strncmp(url,"/user-agent",11) == 0){
+			char *user_agent = strstr(buffer, "User-Agent:");
+			if(user_agent){
+				user_agent+=12;
+				char *eol = strstr(user_agent,"\r\n");
+				if(eol)*eol = '\0';
+				
+			}
+			else{
+				user_agent = "User-Agent not found";
+			}
+			printf("user-agent: %s", user_agent);
+			snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
+		}
+		
 		else{
-			user_agent = "User-Agent not found";
+			snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
 		}
-		printf("user-agent: %s", user_agent);
-		snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(user_agent),user_agent);
 	}
-	
-	else{
-		snprintf(response, sizeof(response),"HTTP/1.1 404 Not Found\r\n\r\n\r\n");
-	}
+
+	else if (strcmp(method,"POST") == 0){
+		if(strncmp(url,"/files",7) == 0){
+			char *file_requested = url + 7;
+			char file_path[BUFFER_SIZE];
+			snprintf(file_path, sizeof(filepath), "%s%s", directory, file_requested);
+
+			char *body = strstr(buffer,"\r\n\r\n");
+			if(body == NULL){
+				snprintf(response,sizeof(response),"HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\n400 Bad Request");
+			}
+			else{
+				body += 4;
+				FILE *file = fopen(file_path,"w");
+				if (file == NULL){
+					printf("Error creating file: %s\n", strerror(errno));
+				}
+				else{
+					fprintf(file, "%s",body);
+					fclosd(file);
+
+					snprintf(response,sizeof(response), "HTTP/1.1 201 Created\r\n\r\n" );					
+				}					
+			}			
+		}
+	}	
 
 	write(fd, response, sizeof(response) - 1);
 

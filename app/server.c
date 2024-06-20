@@ -67,12 +67,25 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
-			if(strstr(buffer,"Accept-Encoding: gzip") != NULL){
+			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
+			if(encoding_header != NULL){
+				char *encoding_crlf = strstr(encoding_header,"\r\n");
+				char encodings[BUFFER_SIZE];
+				strncpy(encodings, encoding_header + 17, encoding_crlf - (encoding_header + 17));
+				encodings[encoding_crlf - (encoding_header + 17)] = '\0';
+
+				if(strstr(encodings,"gzip") != NULL){
 				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+				}
+				else{
+					snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+				}
 			}
 			else{
 				snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
 			}
+
+
 			
 		}
 

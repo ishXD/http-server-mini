@@ -93,7 +93,7 @@ void *handle_request(void *socket_desc){
 		if(strncmp(url,"/files",7) == 0){
 			char *file_requested = url + 7;
 			char file_path[BUFFER_SIZE];
-			snprintf(file_path, sizeof(filepath), "%s%s", directory, file_requested);
+			snprintf(file_path, sizeof(file_path), "%s%s", directory, file_requested);
 
 			char *body = strstr(buffer,"\r\n\r\n");
 			if(body == NULL){
@@ -107,7 +107,7 @@ void *handle_request(void *socket_desc){
 				}
 				else{
 					fprintf(file, "%s",body);
-					fclosd(file);
+					fclose(file);
 
 					snprintf(response,sizeof(response), "HTTP/1.1 201 Created\r\n\r\n" );					
 				}					

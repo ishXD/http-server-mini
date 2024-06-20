@@ -28,8 +28,9 @@ int compress_to_gzip(const char *input, char *output, int input_len, int *output
 
 	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
     deflate(&zs, Z_FINISH);
+	*output_len = zs.total_out;
     deflateEnd(&zs);
-    return zs.total_out;
+    return 0;
 
 }
 

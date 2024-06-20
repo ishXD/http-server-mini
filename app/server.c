@@ -102,6 +102,7 @@ void *handle_request(void *socket_desc){
 					char *compressed_buffer;
 					long unsigned int compressed_len;
 					compressed_buffer = compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len);
+					printf("gzip: %s",compressed_buffer);
 
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);

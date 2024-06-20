@@ -65,8 +65,15 @@ void *handle_request(void *socket_desc){
 		}
 
 		else if(strncmp(url,"/echo/",6) == 0){
+
 			char *echo_msg = url + 6;
-			snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+			if(strstr(buffer,"Accept-Encoding: gzip") != NULL){
+				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+			}
+			else{
+				snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+			}
+			
 		}
 
 		else if(strncmp(url,"/user-agent",11) == 0){

@@ -53,6 +53,7 @@ void *handle_request(void *socket_desc){
 	char method[16], url[256], protocol[16];
 	sscanf(buffer,"%s %s %s", method,url,protocol);
 	printf("URL: %s\n", url);
+	printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
 
 	char response[BUFFER_SIZE];
 

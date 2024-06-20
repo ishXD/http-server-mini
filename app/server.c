@@ -16,42 +16,32 @@
 
 char directory[BUFFER_SIZE] = "."; //current directory
 
-int compress_to_gzip(const char *input, char *output, int input_len, int *output_len){
+char *compress_to_gzip(char *input, int input_len, int *gzip_len){
 	z_stream zs;
-	memset(&zs, 0, sizeof(zs));
+	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8, Z_DEFAULT_STRATEGY);
+	int max_len = deflateBound(&zs, input_len);
+	char *gzip_data = malloc(max_len);
+	memset(gzip_data, 0, max_len);
 	zs.zalloc = Z_NULL;
 	zs.zfree = Z_NULL;
 	zs.opaque = Z_NULL;
 	zs.avail_in = input_len;
 	zs.next_in = (Bytef *)input;
-	zs.avail_out = *output_len;
-	zs.next_out = (Bytef *)output;
+	zs.avail_out = max_len;
+	zs.next_out = (Bytef *)gzip_data;
 
-	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
     deflate(&zs, Z_FINISH);
-	*output_len = zs.total_out;
+	*gzip_len = zs.total_out;
     deflateEnd(&zs);
-    return 0;
+    return gzip_data;
 
 }
-
-void hex_encode(char *input, char *output, int len) {
-    char hex[] = "0123456789abcdef";
-    for (int i = 0; i < len; i++) {
-        output[i * 2] = hex[input[i] >> 4];
-        output[i * 2 + 1] = hex[input[i] & 15];
-    }
-    output[len * 2] = '\0';
-}
-
-
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
 	
 	char buffer[BUFFER_SIZE]={0};
-	char compressed_buffer[BUFFER_SIZE];
-	int compressed_len = sizeof(compressed_buffer);
+
 
 	//recieve msg
 	int msg_Read = read(fd, buffer, BUFFER_SIZE);
@@ -108,11 +98,11 @@ void *handle_request(void *socket_desc){
 				strncpy(encodings, encoding_header + 17, encoding_crlf - (encoding_header + 17));
 				encodings[encoding_crlf - (encoding_header + 17)] = '\0';
 
-				if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0){
-					char encoded_response[BUFFER_SIZE *2 +1];
-					hex_encode(compressed_buffer, encoded_response, compressed_len);
-					strcpy(compressed_buffer,encoded_response);
-					compressed_len = strlen(encoded_response);
+				if(strstr(encodings,"gzip") != NULL){
+					char *compressed_buffer;
+					long long compressed_len;
+					compressed_buffer = compress_to_gzip(echo_msg, strlen(echo_msg), &compressed_len);
+					
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);
 					write(fd, compressed_buffer, compressed_len);

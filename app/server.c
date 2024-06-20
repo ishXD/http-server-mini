@@ -161,8 +161,8 @@ void *handle_request(void *socket_desc){
 	}	
 
 	write(fd, response, sizeof(response) - 1);
-	if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0) {
-        write(new_socket, compressed_body, compressed_len);
+	if(compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0) {
+        write(fd, compressed_buffer, compressed_len);
 	}
 	close(fd);
 	return NULL;

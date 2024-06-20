@@ -105,13 +105,13 @@ void *handle_request(void *socket_desc){
 					printf("gzip: %s",gzip_deflate(echo_msg, strlen(echo_msg), &compressed_len));
 					
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %ld\r\n\r\n",compressed_len);
-					// send(fd, response, strlen(response), 0);
-    				// send(fd, compressed_buffer, compressed_len, 0);
-					
-					write(fd, response, sizeof(response) - 1);
-					write(fd, compressed_buffer, compressed_len);
+					send(fd, response, strlen(response), 0);
+    				send(fd, compressed_buffer, compressed_len, 0);
 
-
+					return;
+					//write() gives gzip:invalid header error
+					// write(fd, response, sizeof(response) - 1);
+					// write(fd, compressed_buffer, compressed_len);
 				}
 				else{
 					snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
@@ -171,7 +171,7 @@ void *handle_request(void *socket_desc){
 		snprintf(response, sizeof(response), "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n405 Method Not Allowed");
 	}	
 
-	//write(fd, response, sizeof(response) - 1);
+	write(fd, response, sizeof(response) - 1);
 	close(fd);
 	return NULL;
 

@@ -164,7 +164,7 @@ void *handle_request(void *socket_desc){
 		snprintf(response, sizeof(response), "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n405 Method Not Allowed");
 	}	
 
-	write(fd, response, sizeof(response) - 1);
+	//write(fd, response, sizeof(response) - 1);
 	close(fd);
 	return NULL;
 

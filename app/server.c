@@ -17,7 +17,7 @@
 char directory[BUFFER_SIZE] = "."; //current directory
 
 static char *compress_to_gzip(char *input, size_t input_len, size_t *gzip_len){
-	z_stream zs;
+	z_stream zs = {0};
 	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 0x1F, 8, Z_DEFAULT_STRATEGY);
 	size_t max_len = deflateBound(&zs, input_len);
 	char *gzip_data = malloc(max_len);

@@ -8,17 +8,38 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/types.h>
-#include <sys/stat.h>
+#include <zlib.h>
 
+#define CHUNK 16384
 #define BUFFER_SIZE 1024
 
+
 char directory[BUFFER_SIZE] = "."; //current directory
+
+int compress_to_gzip(const char *input, char *output, int input_len, int *output_len){
+	z_stream zs;
+	zs.zalloc = Z_NULL;
+	zs.zfree = Z_NULL;
+	zs.opaque = Z_NULL;
+	zs.avail_in = input_len;
+	zs.next_in = (Bytef *)input;
+	zs.avail_out = *output_len;
+	zs.next_out = (Bytef *)output;
+
+	deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
+    deflate(&zs, Z_FINISH);
+    deflateEnd(&zs);
+    return zs.total_out;
+
+}
 
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
 	
 	char buffer[BUFFER_SIZE]={0};
+	char compressed_buffer[BUFFER_SIZE];
+	int compressed_len = sizeof(compressed_buffer);
 
 	//recieve msg
 	int msg_Read = read(fd, buffer, BUFFER_SIZE);
@@ -74,8 +95,10 @@ void *handle_request(void *socket_desc){
 				strncpy(encodings, encoding_header + 17, encoding_crlf - (encoding_header + 17));
 				encodings[encoding_crlf - (encoding_header + 17)] = '\0';
 
-				if(strstr(encodings,"gzip") != NULL){
-				snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
+				if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0){
+					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
+					write(fd, compressed buffer, compressed_len);
+
 				}
 				else{
 					snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
@@ -83,10 +106,7 @@ void *handle_request(void *socket_desc){
 			}
 			else{
 				snprintf(response, sizeof(response),"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s",strlen(echo_msg),echo_msg);
-			}
-
-
-			
+			}	
 		}
 
 		else if(strncmp(url,"/user-agent",11) == 0){
@@ -139,6 +159,11 @@ void *handle_request(void *socket_desc){
 	}	
 
 	write(fd, response, sizeof(response) - 1);
+
+	if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0){
+		write(fd, compressed_buffer, compressed_len);
+	}
+	
 
 	close(fd);
 	return NULL;

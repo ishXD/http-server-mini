@@ -35,6 +35,16 @@ int compress_to_gzip(const char *input, char *output, int input_len, int *output
 
 }
 
+void hex_encode(char *input, char *output, int len) {
+    char hex[] = "0123456789abcdef";
+    for (int i = 0; i < len; i++) {
+        output[i * 2] = hex[input[i] >> 4];
+        output[i * 2 + 1] = hex[input[i] & 15];
+    }
+    output[len * 2] = '\0';
+}
+
+
 void *handle_request(void *socket_desc){
 	int fd = *(int *)socket_desc;
 	free(socket_desc);
@@ -91,7 +101,6 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
-			//printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
 			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
 			if(encoding_header != NULL){
 				char *encoding_crlf = strstr(encoding_header,"\r\n");
@@ -100,6 +109,10 @@ void *handle_request(void *socket_desc){
 				encodings[encoding_crlf - (encoding_header + 17)] = '\0';
 
 				if(strstr(encodings,"gzip") != NULL && compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len) == 0){
+					char encoded_response[BUFFER_SIZE *2 +1];
+					hex_encode(compressed_buffer, encoded_response, compressed_len);
+					strcpy(compressed_buffer,encoded_response);
+					compressed_len = strlen(encoded_response);
 					snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Encoding: gzip\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n",compressed_len);
 					write(fd, response, sizeof(response) - 1);
 					write(fd, compressed_buffer, compressed_len);

@@ -18,6 +18,7 @@ char directory[BUFFER_SIZE] = "."; //current directory
 
 int compress_to_gzip(const char *input, char *output, int input_len, int *output_len){
 	z_stream zs;
+	memset(&zs, 0, sizeof(zs));
 	zs.zalloc = Z_NULL;
 	zs.zfree = Z_NULL;
 	zs.opaque = Z_NULL;
@@ -90,7 +91,7 @@ void *handle_request(void *socket_desc){
 		else if(strncmp(url,"/echo/",6) == 0){
 
 			char *echo_msg = url + 6;
-			printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
+			//printf("%d",compress_to_gzip(echo_msg, compressed_buffer, strlen(echo_msg), &compressed_len));
 			char *encoding_header = strstr(buffer,"Accept-Encoding: ");
 			if(encoding_header != NULL){
 				char *encoding_crlf = strstr(encoding_header,"\r\n");
